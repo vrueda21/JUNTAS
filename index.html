@@ -225,6 +225,7 @@
       </div>
       <div class="auth-form" id="registerForm">
         <div class="field-wrap"><label>Nombre completo</label><input type="text" id="regName" placeholder="ej. Valentina Mora"></div>
+        <div class="field-wrap"><label>Fecha de nacimiento</label><input type="date" id="regDob" max="2006-01-01"></div>
         <div class="field-wrap"><label>Nombre de usuario</label><input type="text" id="regUser" placeholder="ej. valentina" autocomplete="username"></div>
         <div class="field-wrap"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
         <button class="auth-btn" onclick="doRegister()">Crear cuenta</button>
@@ -288,10 +289,22 @@
             <div class="heat-dot" data-v="4">4+</div>
           </div>
         </div>
-        <div class="field-row">
-          <span class="field-label">Sueño</span>
-          <input type="range" min="3" max="10" step="0.5" value="7" id="sleepSlider">
-          <span class="range-val" id="sleepVal">7.0 h</span>
+        <div class="field-row" style="align-items:flex-start">
+          <span class="field-label" style="padding-top:2px">Sueño</span>
+          <div style="flex:1">
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <div class="sleep-toggle-btn active" id="sleepYes" onclick="toggleSleep(true)" style="flex:1;padding:7px;border-radius:6px;border:.5px solid var(--border2);background:var(--primary);color:#fff;font-size:12px;font-weight:500;text-align:center;cursor:pointer;transition:all .15s">Sí dormí</div>
+              <div class="sleep-toggle-btn" id="sleepNo" onclick="toggleSleep(false)" style="flex:1;padding:7px;border-radius:6px;border:.5px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:12px;text-align:center;cursor:pointer;transition:all .15s">No dormí bien</div>
+            </div>
+            <div id="sleepSliderWrap" style="display:flex;align-items:center;gap:8px">
+              <input type="range" min="3" max="10" step="0.5" value="7" id="sleepSlider" style="flex:1">
+              <span class="range-val" id="sleepVal">7.0 h</span>
+            </div>
+          </div>
+        </div>
+        <div class="field-row" style="align-items:flex-start">
+          <span class="field-label" style="padding-top:8px">Otros síntomas</span>
+          <textarea id="otherSymptoms" placeholder="Ej: dolor de cabeza, irritabilidad, sequedad..." style="flex:1;padding:9px 12px;border:.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg2);resize:none;height:72px;line-height:1.5;transition:border .15s" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
         </div>
         <div class="field-row" style="align-items:flex-start">
           <span class="field-label" style="padding-top:6px">Alimentación</span>
@@ -339,13 +352,12 @@
         <div class="filter-chip" data-f="video">Videos</div>
         <div class="filter-chip" data-f="podcast">Podcasts</div>
       </div>
-      <div class="resource-card" data-type="articulo"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">¿Qué le pasa a tu cuerpo en la perimenopausia? Una guía completa</div><div class="res-meta">Dra. Isabel Romero · 8 min de lectura</div><span class="res-badge">Verificado por especialistas</span></div>
-      <div class="resource-card" data-type="video"><div class="res-type" style="color:var(--primary)">Video</div><div class="res-title">Terapia hormonal en la menopausia: mitos y realidades</div><div class="res-meta">Dr. Carlos Vega, Ginecólogo · 22 min</div><span class="res-badge">Verificado por especialistas</span></div>
-      <div class="resource-card" data-type="podcast"><div class="res-type" style="color:#2e6b0a">Podcast</div><div class="res-title">Alimentación antiinflamatoria para reducir síntomas — Ep. 14</div><div class="res-meta">JUNTAS Podcast · 41 min</div><span class="res-badge">Verificado por especialistas</span></div>
-      <div class="resource-card" data-type="articulo"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">Sueño y menopausia: estrategias respaldadas por evidencia</div><div class="res-meta">Equipo JUNTAS · 5 min de lectura</div><span class="res-badge">Verificado por especialistas</span></div>
-      <div class="resource-card" data-type="podcast"><div class="res-type" style="color:#2e6b0a">Podcast</div><div class="res-title">Sexualidad en la menopausia: conversaciones que importan</div><div class="res-meta">JUNTAS Podcast · 35 min</div><span class="res-badge">Verificado por especialistas</span></div>
-      <div class="resource-card" data-type="video"><div class="res-type" style="color:var(--primary)">Video</div><div class="res-title">Ejercicio físico en la menopausia: qué funciona y qué no</div><div class="res-meta">Dra. Paula Herrera · 18 min</div><span class="res-badge">Verificado por especialistas</span></div>
-      <div class="resource-card" data-type="articulo"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">Salud ósea y menopausia: prevención de la osteoporosis</div><div class="res-meta">Equipo JUNTAS · 7 min de lectura</div><span class="res-badge">Verificado por especialistas</span></div>
+      <a class="resource-card" data-type="articulo" href="https://espanol.womenshealth.gov/menopause/menopause-symptoms-and-relief" target="_blank" style="text-decoration:none;display:block"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">Síntomas de la menopausia y cómo aliviarlos</div><div class="res-meta">Office on Women's Health · womenshealth.gov</div><span class="res-badge">Fuente oficial verificada</span></a>
+      <a class="resource-card" data-type="articulo" href="https://magazine.medlineplus.gov/es/art%C3%ADculo/lo-que-sabemos-y-lo-que-todavia-ignoramos-sobre-la-menopausia" target="_blank" style="text-decoration:none;display:block"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">Lo que sabemos (y lo que aún ignoramos) sobre la menopausia</div><div class="res-meta">MedlinePlus Magazine · NIH</div><span class="res-badge">Fuente oficial verificada</span></a>
+      <a class="resource-card" data-type="articulo" href="https://www.plannedparenthood.org/es/temas-de-salud/salud-y-bienestar/menopausia/cuales-son-los-sintomas-de-la-menopausia" target="_blank" style="text-decoration:none;display:block"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">¿Cuáles son los síntomas de la menopausia?</div><div class="res-meta">Planned Parenthood · plannedparenthood.org</div><span class="res-badge">Fuente oficial verificada</span></a>
+      <a class="resource-card" data-type="podcast" href="https://www.youtube.com/watch?v=lEHDPGlYimU" target="_blank" style="text-decoration:none;display:block"><div class="res-type" style="color:#2e6b0a">Podcast / Video</div><div class="res-title">Menopausia: todo lo que necesitas saber</div><div class="res-meta">YouTube · youtube.com</div><span class="res-badge">Fuente verificada</span></a>
+      <a class="resource-card" data-type="podcast" href="https://www.youtube.com/watch?v=3QEIlnZXPjc" target="_blank" style="text-decoration:none;display:block"><div class="res-type" style="color:#2e6b0a">Podcast / Video</div><div class="res-title">Salud hormonal en la menopausia</div><div class="res-meta">YouTube · youtube.com</div><span class="res-badge">Fuente verificada</span></a>
+      <a class="resource-card" data-type="podcast" href="https://www.youtube.com/watch?v=uKvydd-1LT8" target="_blank" style="text-decoration:none;display:block"><div class="res-type" style="color:#2e6b0a">Podcast / Video</div><div class="res-title">Bienestar y menopausia: experiencias reales</div><div class="res-meta">YouTube · youtube.com</div><span class="res-badge">Fuente verificada</span></a>
     </div>
 
     <!-- COMUNIDAD -->
@@ -436,7 +448,7 @@ function setSession(u){if(u)localStorage.setItem(SESSION_KEY,u);else localStorag
 /* STATE */
 let cu=null; // {username,nombre}
 let D=defData();
-let sMood=null,sHeat=null,sFood=null;
+let sMood=null,sHeat=null,sFood=null,sOther='',sleepActive=true;
 const mL={1:'Difícil',2:'Regular',3:'Bien',4:'Muy bien',5:'Excelente'};
 const mE={1:'😔',2:'😐',3:'🙂',4:'😊',5:'😄'};
 
@@ -450,6 +462,7 @@ function switchAuthTab(t){
 }
 function doRegister(){
   const name=document.getElementById('regName').value.trim();
+  const dob=document.getElementById('regDob').value;
   const user=document.getElementById('regUser').value.trim().toLowerCase().replace(/\s+/g,'');
   const pass=document.getElementById('regPass').value;
   const err=document.getElementById('registerErr');
@@ -457,7 +470,7 @@ function doRegister(){
   if(pass.length<4){err.textContent='Contraseña: mínimo 4 caracteres.';return;}
   const acc=getAccounts();
   if(acc[user]){err.textContent='Ese usuario ya existe.';return;}
-  acc[user]={nombre:name,pass:btoa(pass)};
+  acc[user]={nombre:name,dob:dob,pass:btoa(pass)};
   saveAccounts(acc);
   loginUser(user,name);
 }
@@ -564,7 +577,9 @@ function renderHistorial(){
     if(last.heat!=null)chips.push(`<span class="hist-chip" style="background:var(--chip-heat-bg);color:var(--chip-heat-tx)">Calores: ${last.heat}${last.heat===4?'+':''}</span>`);
     if(last.sleep)chips.push(`<span class="hist-chip" style="background:var(--chip-sleep-bg);color:var(--chip-sleep-tx)">${last.sleep.toFixed(1)}h sueño</span>`);
     if(last.food)chips.push(`<span class="hist-chip" style="background:var(--chip-food-bg);color:var(--chip-food-tx)">${last.food}</span>`);
-    return `<div class="hist-entry"><div class="hist-date">${formatDate(date)}${count}</div><div class="hist-chips">${chips.join('')}</div></div>`;
+    if(last.sleepSkipped)chips.push(`<span class="hist-chip" style="background:#fce8e8;color:#9b1c1c">Mal sueño</span>`);
+    if(last.other)chips.push(`<span class="hist-chip" style="background:var(--bg2);color:var(--text2);border:.5px solid var(--border2)" title="${last.other}">+ Otros síntomas</span>`);
+    return `<div class="hist-entry"><div class="hist-date">${formatDate(date)}${count}</div><div class="hist-chips">${chips.join('')}</div>${last.other?`<div style="font-size:12px;color:var(--text2);margin-top:5px;font-style:italic">${last.other}</div>`:''}</div>`;
   }).join('');
 }
 
@@ -609,12 +624,23 @@ const sliderVal=document.getElementById('sleepVal');
 slider.addEventListener('input',()=>{sliderVal.textContent=parseFloat(slider.value).toFixed(1)+' h';});
 function resetForm(){
   document.querySelectorAll('.mood-btn,.heat-dot,.food-chip').forEach(x=>x.classList.remove('selected','active'));
-  sMood=null;sHeat=null;sFood=null;slider.value=7;sliderVal.textContent='7.0 h';
+  sMood=null;sHeat=null;sFood=null;sOther='';slider.value=7;sliderVal.textContent='7.0 h';
+  document.getElementById('otherSymptoms').value='';
+  toggleSleep(true);
+}
+function toggleSleep(active){
+  sleepActive=active;
+  const yes=document.getElementById('sleepYes');const no=document.getElementById('sleepNo');
+  const wrap=document.getElementById('sleepSliderWrap');
+  if(active){yes.style.background='var(--primary)';yes.style.color='#fff';yes.style.borderColor='var(--primary)';no.style.background='var(--bg2)';no.style.color='var(--text2)';no.style.borderColor='var(--border2)';wrap.style.opacity='1';wrap.style.pointerEvents='auto';}
+  else{no.style.background='var(--primary)';no.style.color='#fff';no.style.borderColor='var(--primary)';yes.style.background='var(--bg2)';yes.style.color='var(--text2)';yes.style.borderColor='var(--border2)';wrap.style.opacity='.35';wrap.style.pointerEvents='none';}
 }
 document.getElementById('saveBtn').addEventListener('click',()=>{
   if(!cu)return;
-  if(!sMood&&sHeat===null&&!sFood){showToast('Selecciona al menos un dato');return;}
-  const entry={date:todayStr(),mood:sMood,heat:sHeat,sleep:parseFloat(slider.value),food:sFood,ts:Date.now()};
+  sOther=document.getElementById('otherSymptoms').value.trim();
+  if(!sMood&&sHeat===null&&!sFood&&!sOther){showToast('Selecciona al menos un dato');return;}
+  const sleepVal2=sleepActive?parseFloat(slider.value):0;
+  const entry={date:todayStr(),mood:sMood,heat:sHeat,sleep:sleepVal2,sleepSkipped:!sleepActive,food:sFood,other:sOther,ts:Date.now()};
   D.entries.push(entry);
   saveUserData(cu.username,D);
   updateMetrics();renderHistorial();updateHeader();renderDataStats();
