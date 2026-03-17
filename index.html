@@ -308,6 +308,27 @@
       <div class="card"><div class="no-data" id="noHistData">Aún no hay registros. ¡Empieza hoy!</div><div id="historialList"></div></div>
       <div class="section-label" style="margin-top:8px">Resultados hormonales</div>
       <div class="card"><div class="no-data" id="noHormonaData">Sin resultados registrados.</div><div id="hormonaList"></div><button class="outline-btn" onclick="openHormonaModal()">+ Añadir resultados</button></div>
+
+      <div class="section-label" style="margin-top:8px">Mis datos</div>
+      <div class="card">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5">Exporta todos tus registros como archivo JSON o CSV. También puedes importar una copia anterior.</div>
+        <div id="dataStats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="save-btn" onclick="exportJSON()" style="display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2v8M5 7l3 3 3-3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+            Exportar JSON completo
+          </button>
+          <button class="outline-btn" onclick="exportCSV()" style="margin-top:0;display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2v8M5 7l3 3 3-3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+            Exportar registros CSV (Excel)
+          </button>
+          <label class="outline-btn" style="margin-top:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 14V6M5 9l3-3 3 3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+            Importar copia de seguridad
+            <input type="file" accept=".json" id="importFile" style="display:none" onchange="importJSON(event)">
+          </label>
+        </div>
+      </div>
     </div>
 
     <!-- APRENDE -->
@@ -455,7 +476,7 @@ function loginUser(username,nombre){
   D=getUserData(username);
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('appScreen').classList.add('active');
-  updateClock();updateHeader();updateMetrics();renderHistorial();renderHormonas();restoreInscripciones();resetForm();switchTab('registro');
+  updateClock();updateHeader();updateMetrics();renderHistorial();renderHormonas();restoreInscripciones();resetForm();renderDataStats();switchTab('registro');
 }
 function doLogout(){
   setSession(null);cu=null;D=defData();
@@ -596,7 +617,7 @@ document.getElementById('saveBtn').addEventListener('click',()=>{
   const entry={date:todayStr(),mood:sMood,heat:sHeat,sleep:parseFloat(slider.value),food:sFood,ts:Date.now()};
   D.entries.push(entry);
   saveUserData(cu.username,D);
-  updateMetrics();renderHistorial();updateHeader();
+  updateMetrics();renderHistorial();updateHeader();renderDataStats();
   showToast('Registro guardado ✓');resetForm();
 });
 
@@ -640,6 +661,55 @@ function restoreInscripciones(){
     if(D.inscripciones.includes(btn.dataset.ev)){btn.textContent='✓ Inscrita';btn.classList.add('inscrito');}
     else{btn.classList.remove('inscrito');btn.textContent=btn.dataset.ev.includes('foro')?'Unirme':'Inscribirme';}
   });
+}
+
+/* DATA STATS */
+function renderDataStats(){
+  const el=document.getElementById('dataStats');if(!el||!cu)return;
+  const days=[...new Set((D.entries||[]).map(e=>e.date))].length;
+  el.innerHTML=[{label:'Registros',val:(D.entries||[]).length},{label:'Días',val:days},{label:'Hormonas',val:(D.hormonas||[]).length}]
+    .map(s=>`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-size:20px;font-weight:500;color:var(--primary)">${s.val}</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">${s.label}</div></div>`).join('');
+}
+
+/* EXPORT JSON */
+function exportJSON(){
+  if(!cu)return;
+  const blob=new Blob([JSON.stringify({exportada:new Date().toISOString(),usuario:cu.nombre,username:cu.username,datos:D},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='juntas_'+cu.username+'_'+todayStr()+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('JSON descargado ✓');
+}
+
+/* EXPORT CSV */
+function exportCSV(){
+  if(!cu)return;
+  if(!(D.entries||[]).length){showToast('No hay registros para exportar');return;}
+  const mL2={1:'Difícil',2:'Regular',3:'Bien',4:'Muy bien',5:'Excelente'};
+  const rows=(D.entries||[]).map(e=>[e.date,e.mood?mL2[e.mood]:'',e.heat!=null?e.heat+(e.heat===4?'+':''):'',e.sleep?e.sleep.toFixed(1):'',e.food||''].join(','));
+  const blob=new Blob(['\uFEFFecha,Estado de ánimo,Calores,Horas de sueño,Alimentación\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='juntas_registros_'+cu.username+'_'+todayStr()+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('CSV descargado ✓');
+}
+
+/* IMPORT JSON */
+function importJSON(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(!parsed.datos){showToast('Archivo no válido');return;}
+      const msg=parsed.username!==cu.username
+        ?'Este archivo es de "'+parsed.usuario+'". ¿Importar y reemplazar tus datos actuales?'
+        :'Esto reemplazará todos tus registros actuales. ¿Continuar?';
+      if(!confirm(msg))return;
+      D=parsed.datos;saveUserData(cu.username,D);
+      updateMetrics();renderHistorial();renderHormonas();updateHeader();renderDataStats();
+      showToast('Datos importados ✓');
+    }catch(err){showToast('Error al leer el archivo');}
+  };
+  reader.readAsText(file);event.target.value='';
 }
 
 /* TOAST */
