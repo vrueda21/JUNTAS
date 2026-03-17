@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="JUNTAS">
+<meta name="theme-color" content="#92314c">
+<title>JUNTAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:   #92314c;
+    --primary2:  #ab5b6d;
+    --primary3:  #b76f7e;
+    --primary4:  #e2c0c6;
+    --primary5:  #f5e8eb;
+    --bg:        #ffffff;
+    --bg2:       #fdf5f6;
+    --bg3:       #f7eaed;
+    --text:      #2a1018;
+    --text2:     #7a4d57;
+    --text3:     #b08990;
+    --border:    rgba(146,49,76,0.12);
+    --border2:   rgba(146,49,76,0.25);
+    --radius:    12px;
+    --radius-sm: 8px;
+    --chip-mood-bg:#f5e8eb; --chip-mood-tx:#92314c;
+    --chip-heat-bg:#faeeda; --chip-heat-tx:#8a5200;
+    --chip-sleep-bg:#e8f0fb; --chip-sleep-tx:#1a4f8a;
+    --chip-food-bg:#eaf3de; --chip-food-tx:#2e5c0a;
+    --tag-n-bg:#eaf3de; --tag-n-tx:#2e5c0a;
+    --tag-l-bg:#faeeda; --tag-l-tx:#8a5200;
+    --tag-h-bg:#fce8e8; --tag-h-tx:#9b1c1c;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; color-scheme:light; }
+  html,body { height:100%; overflow:hidden; background:var(--bg3); }
+  body { font-family:'DM Sans',sans-serif; color:var(--text); }
+
+  .screen { display:none; flex-direction:column; height:100%; }
+  .screen.active { display:flex; }
+
+  /* AUTH */
+  .auth-screen { background:var(--bg); justify-content:center; align-items:center; padding:32px 28px; overflow-y:auto; }
+  .auth-logo { font-family:'DM Serif Display',serif; font-style:italic; font-size:44px; color:var(--primary); letter-spacing:-1px; margin-bottom:6px; }
+  .auth-tagline { font-size:13px; color:var(--text2); text-align:center; margin-bottom:32px; line-height:1.5; max-width:220px; }
+  .auth-box { width:100%; max-width:340px; }
+  .auth-tabs { display:flex; border-bottom:1px solid var(--border2); margin-bottom:22px; }
+  .auth-tab { flex:1; text-align:center; padding:10px 0; font-size:14px; color:var(--text2); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; }
+  .auth-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:500; }
+  .auth-form { display:none; }
+  .auth-form.active { display:block; }
+  .field-wrap { margin-bottom:13px; }
+  .field-wrap label { font-size:12px; color:var(--text2); display:block; margin-bottom:5px; }
+  .field-wrap input { width:100%; padding:11px 14px; border:1px solid var(--border2); border-radius:var(--radius-sm); font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); background:var(--bg2); transition:border .15s; }
+  .field-wrap input:focus { outline:none; border-color:var(--primary); }
+  .auth-btn { width:100%; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:var(--radius-sm); font-size:14px; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:opacity .15s; }
+  .auth-btn:hover { opacity:.88; } .auth-btn:active { opacity:.73; }
+  .auth-err { font-size:12px; color:#b91c1c; margin-top:8px; min-height:16px; text-align:center; }
+  .quick-section { margin-top:28px; width:100%; max-width:340px; }
+  .quick-title { font-size:11px; color:var(--text3); letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+  .avatar-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .user-av { display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; }
+  .av-circle { width:48px; height:48px; border-radius:50%; background:var(--primary4); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:500; color:var(--primary); border:2px solid transparent; transition:border .15s; }
+  .user-av:hover .av-circle { border-color:var(--primary); }
+  .av-name { font-size:11px; color:var(--text2); max-width:52px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* APP */
+  .app-screen { background:var(--bg3); max-width:430px; width:100%; margin:0 auto; }
+  .status-bar { background:var(--bg); padding:12px 20px 0; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+  .status-time { font-size:13px; font-weight:500; }
+  .s-dot { width:5px; height:5px; border-radius:50%; background:var(--text3); }
+  .status-icons { display:flex; gap:5px; align-items:center; }
+  .header { background:var(--bg); padding:12px 20px 16px; border-bottom:.5px solid var(--border); flex-shrink:0; display:flex; justify-content:space-between; align-items:flex-end; }
+  .greeting { font-size:11px; color:var(--text2); letter-spacing:.09em; text-transform:uppercase; margin-bottom:2px; }
+  .user-name { font-family:'DM Serif Display',serif; font-style:italic; font-size:23px; color:var(--text); }
+  .streak-pill { display:inline-flex; align-items:center; gap:6px; margin-top:7px; background:var(--primary5); padding:4px 12px; border-radius:20px; }
+  .streak-pill span { font-size:11px; color:var(--primary); font-weight:500; }
+  .s-pink { width:6px; height:6px; border-radius:50%; background:var(--primary); }
+  .logout-btn { font-size:12px; color:var(--text2); background:none; border:.5px solid var(--border2); border-radius:20px; padding:5px 12px; cursor:pointer; font-family:'DM Sans',sans-serif; flex-shrink:0; margin-bottom:2px; transition:background .15s; }
+  .logout-btn:hover { background:var(--bg2); }
+  .tab-bar { background:var(--bg); display:flex; border-bottom:.5px solid var(--border); padding:0 20px; flex-shrink:0; }
+  .tab { padding:12px 0; margin-right:22px; font-size:13px; color:var(--text2); border-bottom:2px solid transparent; cursor:pointer; transition:all .2s; user-select:none; }
+  .tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:500; }
+  .scroll-content { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .content { padding:18px 16px 24px; display:none; }
+  .content.active { display:block; }
+  .section-label { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); margin-bottom:10px; font-weight:500; }
+  .card { background:var(--bg); border:.5px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px; }
+
+  /* METRICS */
+  .metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+  .metric-card { background:var(--bg); border:.5px solid var(--border); border-radius:var(--radius); padding:13px; }
+  .m-label { font-size:10px; color:var(--text2); letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
+  .m-value { font-size:19px; font-weight:500; color:var(--text); }
+  .m-sub { font-size:11px; color:var(--text2); margin-top:2px; }
+  .m-bar-wrap { margin-top:8px; height:2px; background:var(--border); border-radius:2px; }
+  .m-bar { height:2px; border-radius:2px; transition:width .4s ease; }
+
+  /* LOG */
+  .log-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .log-title { font-size:14px; font-weight:500; }
+  .log-date { font-size:11px; color:var(--text2); }
+  .mood-row { display:flex; gap:8px; margin-bottom:14px; }
+  .mood-btn { width:42px; height:42px; border-radius:50%; border:.5px solid var(--border); background:var(--bg2); cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; transition:all .15s; user-select:none; }
+  .mood-btn.selected { border:2px solid var(--primary); background:var(--primary5); }
+  .field-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .field-label { font-size:12px; color:var(--text2); min-width:64px; }
+  .heat-scale { display:flex; gap:5px; flex:1; }
+  .heat-dot { width:36px; height:32px; border-radius:6px; border:.5px solid var(--border); background:var(--bg2); cursor:pointer; font-size:11px; font-weight:500; display:flex; align-items:center; justify-content:center; color:var(--text2); transition:all .15s; user-select:none; }
+  .heat-dot.active { background:var(--chip-heat-bg); border-color:#c47a00; color:var(--chip-heat-tx); }
+  input[type=range] { flex:1; accent-color:var(--primary); height:3px; }
+  .range-val { font-size:13px; font-weight:500; min-width:42px; text-align:right; }
+  .food-options { display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+  .food-chip { padding:5px 11px; border-radius:20px; border:.5px solid var(--border2); font-size:12px; color:var(--text2); cursor:pointer; background:var(--bg2); transition:all .15s; user-select:none; }
+  .food-chip.selected { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .save-btn { width:100%; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:var(--radius-sm); font-size:14px; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; margin-top:4px; transition:opacity .15s; }
+  .save-btn:hover { opacity:.87; } .save-btn:active { opacity:.73; transform:scale(.99); }
+
+  /* HISTORIAL */
+  .hist-entry { border-bottom:.5px solid var(--border); padding:12px 0; }
+  .hist-entry:last-child { border-bottom:none; }
+  .hist-date { font-size:12px; color:var(--text2); margin-bottom:5px; }
+  .hist-chips { display:flex; gap:5px; flex-wrap:wrap; }
+  .hist-chip { font-size:11px; padding:2px 8px; border-radius:10px; font-weight:500; }
+  .no-data { text-align:center; padding:28px 0; color:var(--text2); font-size:13px; }
+
+  /* HORMONAS */
+  .hormona-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:.5px solid var(--border); }
+  .hormona-row:last-child { border-bottom:none; }
+  .hormona-name { font-size:13px; }
+  .hormona-right { display:flex; align-items:center; gap:8px; }
+  .hormona-val { font-size:13px; font-weight:500; }
+  .tag { font-size:11px; padding:2px 8px; border-radius:10px; font-weight:500; }
+  .tag-n { background:var(--tag-n-bg); color:var(--tag-n-tx); }
+  .tag-l { background:var(--tag-l-bg); color:var(--tag-l-tx); }
+  .tag-h { background:var(--tag-h-bg); color:var(--tag-h-tx); }
+  .outline-btn { width:100%; padding:11px; border:1px solid var(--border2); border-radius:var(--radius-sm); background:transparent; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--primary); cursor:pointer; margin-top:10px; transition:background .15s; }
+  .outline-btn:hover { background:var(--primary5); }
+
+  /* APRENDE */
+  .filter-row { display:flex; gap:7px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
+  .filter-row::-webkit-scrollbar { display:none; }
+  .filter-chip { padding:6px 14px; border-radius:20px; border:.5px solid var(--border2); font-size:12px; cursor:pointer; white-space:nowrap; background:var(--bg); color:var(--text2); transition:all .15s; user-select:none; }
+  .filter-chip.on { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .resource-card { background:var(--bg); border:.5px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:10px; cursor:pointer; transition:background .1s; }
+  .resource-card:active { background:var(--bg2); }
+  .res-type { font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:500; margin-bottom:5px; }
+  .res-title { font-size:14px; font-weight:500; line-height:1.4; margin-bottom:5px; color:var(--text); }
+  .res-meta { font-size:12px; color:var(--text2); }
+  .res-badge { display:inline-block; font-size:11px; padding:3px 8px; border-radius:10px; margin-top:8px; font-weight:500; background:var(--chip-food-bg); color:var(--chip-food-tx); }
+
+  /* COMUNIDAD */
+  .event-card { background:var(--bg); border:.5px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:8px; display:flex; gap:12px; }
+  .ev-date { min-width:46px; text-align:center; background:var(--primary5); border-radius:var(--radius-sm); padding:8px 4px; }
+  .ev-month { font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--primary); font-weight:500; }
+  .ev-day { font-size:22px; font-weight:500; line-height:1.1; color:var(--primary); }
+  .ev-info { flex:1; }
+  .ev-title { font-size:14px; font-weight:500; line-height:1.35; margin-bottom:3px; }
+  .ev-detail { font-size:12px; color:var(--text2); margin-bottom:6px; }
+  .ev-badge { display:inline-block; font-size:11px; padding:3px 8px; border-radius:10px; font-weight:500; }
+  .inscribir-btn { width:100%; padding:11px; border:1px solid var(--border2); border-radius:var(--radius-sm); background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--primary); cursor:pointer; margin-bottom:12px; transition:background .15s; }
+  .inscribir-btn:hover { background:var(--primary5); }
+  .inscribir-btn.inscrito { background:var(--primary5); color:var(--primary); border-color:var(--primary4); font-weight:500; }
+
+  /* NAV */
+  .nav-bar { background:var(--bg); border-top:.5px solid var(--border); display:flex; justify-content:space-around; padding:8px 0 max(16px,env(safe-area-inset-bottom)); flex-shrink:0; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:4px 16px; user-select:none; }
+  .nav-icon { width:22px; height:22px; color:var(--text3); transition:color .15s; }
+  .nav-label { font-size:10px; color:var(--text3); transition:color .15s; }
+  .nav-item.active .nav-icon, .nav-item.active .nav-label { color:var(--primary); }
+  .nav-item.active .nav-label { font-weight:500; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--primary); color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:500; opacity:0; transition:all .3s; z-index:999; white-space:nowrap; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* MODALS */
+  .modal-overlay { position:fixed; inset:0; background:rgba(42,16,24,.38); z-index:200; display:none; align-items:flex-end; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal-sheet { background:var(--bg); border-radius:20px 20px 0 0; padding:20px 20px max(24px,env(safe-area-inset-bottom)); width:100%; max-width:430px; max-height:82vh; overflow-y:auto; }
+  .modal-handle { width:36px; height:4px; border-radius:2px; background:var(--primary4); margin:0 auto 18px; }
+  .modal-title { font-size:16px; font-weight:500; margin-bottom:16px; }
+  .form-label { font-size:12px; color:var(--text2); margin-bottom:5px; display:block; }
+  .form-input { width:100%; padding:10px 12px; border:.5px solid var(--border2); border-radius:var(--radius-sm); font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); background:var(--bg2); margin-bottom:14px; }
+  .form-input:focus { outline:none; border-color:var(--primary); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .confirm-wrap { text-align:center; padding:8px 0; }
+  .confirm-circle { width:54px; height:54px; border-radius:50%; background:var(--primary5); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+  .confirm-title { font-family:'DM Serif Display',serif; font-style:italic; font-size:22px; color:var(--text); margin-bottom:4px; }
+  .confirm-sub { font-size:13px; color:var(--text2); margin-bottom:20px; }
+  .confirm-card { background:var(--bg2); border-radius:var(--radius); padding:14px; text-align:left; }
+  .conf-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:.5px solid var(--border); font-size:13px; }
+  .conf-row:last-child { border-bottom:none; }
+  .conf-label { color:var(--text2); }
+  .conf-val { font-weight:500; color:var(--text); max-width:180px; text-align:right; }
+  .notif-note { display:flex; align-items:center; gap:8px; background:var(--primary5); border-radius:var(--radius-sm); padding:10px 12px; margin-top:12px; }
+  .n-dot { width:7px; height:7px; border-radius:50%; background:var(--primary); flex-shrink:0; }
+  .n-text { font-size:12px; color:var(--primary); line-height:1.4; }
+  .h-table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
+  .h-table th { text-align:left; font-size:11px; color:var(--text2); font-weight:500; padding:6px 0; border-bottom:.5px solid var(--border); }
+  .h-table td { padding:9px 0; border-bottom:.5px solid var(--border); color:var(--text); vertical-align:middle; }
+  .h-table tr:last-child td { border-bottom:none; }
+</style>
+</head>
+<body>
+
+<!-- ── AUTH ── -->
+<div class="screen active" id="authScreen" style="background:var(--bg);justify-content:center;align-items:center;">
+  <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-height:100%;overflow-y:auto;padding:32px 28px;">
+    <div class="auth-logo">JUNTAS</div>
+    <div class="auth-tagline">Tu compañera en cada etapa de la menopausia</div>
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login')">Ingresar</div>
+        <div class="auth-tab" onclick="switchAuthTab('register')">Crear cuenta</div>
+      </div>
+      <div class="auth-form active" id="loginForm">
+        <div class="field-wrap"><label>Nombre de usuario</label><input type="text" id="loginUser" placeholder="ej. valentina" autocomplete="username"></div>
+        <div class="field-wrap"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••" autocomplete="current-password"></div>
+        <button class="auth-btn" onclick="doLogin()">Ingresar</button>
+        <div class="auth-err" id="loginErr"></div>
+      </div>
+      <div class="auth-form" id="registerForm">
+        <div class="field-wrap"><label>Nombre completo</label><input type="text" id="regName" placeholder="ej. Valentina Mora"></div>
+        <div class="field-wrap"><label>Nombre de usuario</label><input type="text" id="regUser" placeholder="ej. valentina" autocomplete="username"></div>
+        <div class="field-wrap"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
+        <button class="auth-btn" onclick="doRegister()">Crear cuenta</button>
+        <div class="auth-err" id="registerErr"></div>
+      </div>
+    </div>
+    <div class="quick-section" id="quickSection" style="display:none">
+      <div class="quick-title">Acceso rápido</div>
+      <div class="avatar-row" id="avatarRow"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div class="screen" id="appScreen" style="max-width:430px;width:100%;margin:0 auto;background:var(--bg3);">
+  <div class="status-bar">
+    <span class="status-time" id="statusTime">9:41</span>
+    <div class="status-icons"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+  </div>
+  <div class="header">
+    <div>
+      <div class="greeting" id="headerDate">Lunes, 16 de marzo</div>
+      <div class="user-name">Hola, <span id="displayName">—</span></div>
+      <div class="streak-pill"><div class="s-pink"></div><span id="streakText">0 días registrando</span></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Salir</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" data-tab="registro">Mi registro</div>
+    <div class="tab" data-tab="aprende">Aprende</div>
+    <div class="tab" data-tab="comunidad">Comunidad</div>
+  </div>
+  <div class="scroll-content">
+
+    <!-- REGISTRO -->
+    <div class="content active" id="tab-registro">
+      <div class="section-label">Resumen de hoy</div>
+      <div class="metric-grid">
+        <div class="metric-card"><div class="m-label">Sueño</div><div class="m-value" id="m-sleep">— h</div><div class="m-sub" id="m-sleep-sub">Sin registro hoy</div><div class="m-bar-wrap"><div class="m-bar" id="bar-sleep" style="width:0%;background:#378ADD"></div></div></div>
+        <div class="metric-card"><div class="m-label">Estado de ánimo</div><div class="m-value" id="m-mood">—</div><div class="m-sub" id="m-mood-sub">Sin registro hoy</div><div class="m-bar-wrap"><div class="m-bar" id="bar-mood" style="width:0%;background:var(--primary)"></div></div></div>
+        <div class="metric-card"><div class="m-label">Calores</div><div class="m-value" id="m-heat">—</div><div class="m-sub" id="m-heat-sub">Sin registro hoy</div><div class="m-bar-wrap"><div class="m-bar" id="bar-heat" style="width:0%;background:#c47a00"></div></div></div>
+        <div class="metric-card"><div class="m-label">Alimentación</div><div class="m-value" id="m-food">—</div><div class="m-sub" id="m-food-sub">Sin registro hoy</div><div class="m-bar-wrap"><div class="m-bar" id="bar-food" style="width:0%;background:#3a7c10"></div></div></div>
+      </div>
+      <div class="section-label">Registrar ahora</div>
+      <div class="card">
+        <div class="log-header"><span class="log-title">¿Cómo te sientes?</span><span class="log-date" id="logDateLabel"></span></div>
+        <div class="mood-row" id="moodRow">
+          <div class="mood-btn" data-mood="1">😔</div>
+          <div class="mood-btn" data-mood="2">😐</div>
+          <div class="mood-btn" data-mood="3">🙂</div>
+          <div class="mood-btn" data-mood="4">😊</div>
+          <div class="mood-btn" data-mood="5">😄</div>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Calores</span>
+          <div class="heat-scale" id="heatScale">
+            <div class="heat-dot" data-v="0">0</div>
+            <div class="heat-dot" data-v="1">1</div>
+            <div class="heat-dot" data-v="2">2</div>
+            <div class="heat-dot" data-v="3">3</div>
+            <div class="heat-dot" data-v="4">4+</div>
+          </div>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Sueño</span>
+          <input type="range" min="3" max="10" step="0.5" value="7" id="sleepSlider">
+          <span class="range-val" id="sleepVal">7.0 h</span>
+        </div>
+        <div class="field-row" style="align-items:flex-start">
+          <span class="field-label" style="padding-top:6px">Alimentación</span>
+          <div class="food-options" id="foodOptions">
+            <div class="food-chip" data-f="Excelente">Excelente</div>
+            <div class="food-chip" data-f="Buena">Buena</div>
+            <div class="food-chip" data-f="Regular">Regular</div>
+            <div class="food-chip" data-f="Mejorable">Mejorable</div>
+          </div>
+        </div>
+        <button class="save-btn" id="saveBtn">Guardar registro</button>
+      </div>
+      <div class="section-label" style="margin-top:8px">Historial completo</div>
+      <div class="card"><div class="no-data" id="noHistData">Aún no hay registros. ¡Empieza hoy!</div><div id="historialList"></div></div>
+      <div class="section-label" style="margin-top:8px">Resultados hormonales</div>
+      <div class="card"><div class="no-data" id="noHormonaData">Sin resultados registrados.</div><div id="hormonaList"></div><button class="outline-btn" onclick="openHormonaModal()">+ Añadir resultados</button></div>
+    </div>
+
+    <!-- APRENDE -->
+    <div class="content" id="tab-aprende">
+      <div class="filter-row">
+        <div class="filter-chip on" data-f="all">Todo</div>
+        <div class="filter-chip" data-f="articulo">Artículos</div>
+        <div class="filter-chip" data-f="video">Videos</div>
+        <div class="filter-chip" data-f="podcast">Podcasts</div>
+      </div>
+      <div class="resource-card" data-type="articulo"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">¿Qué le pasa a tu cuerpo en la perimenopausia? Una guía completa</div><div class="res-meta">Dra. Isabel Romero · 8 min de lectura</div><span class="res-badge">Verificado por especialistas</span></div>
+      <div class="resource-card" data-type="video"><div class="res-type" style="color:var(--primary)">Video</div><div class="res-title">Terapia hormonal en la menopausia: mitos y realidades</div><div class="res-meta">Dr. Carlos Vega, Ginecólogo · 22 min</div><span class="res-badge">Verificado por especialistas</span></div>
+      <div class="resource-card" data-type="podcast"><div class="res-type" style="color:#2e6b0a">Podcast</div><div class="res-title">Alimentación antiinflamatoria para reducir síntomas — Ep. 14</div><div class="res-meta">JUNTAS Podcast · 41 min</div><span class="res-badge">Verificado por especialistas</span></div>
+      <div class="resource-card" data-type="articulo"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">Sueño y menopausia: estrategias respaldadas por evidencia</div><div class="res-meta">Equipo JUNTAS · 5 min de lectura</div><span class="res-badge">Verificado por especialistas</span></div>
+      <div class="resource-card" data-type="podcast"><div class="res-type" style="color:#2e6b0a">Podcast</div><div class="res-title">Sexualidad en la menopausia: conversaciones que importan</div><div class="res-meta">JUNTAS Podcast · 35 min</div><span class="res-badge">Verificado por especialistas</span></div>
+      <div class="resource-card" data-type="video"><div class="res-type" style="color:var(--primary)">Video</div><div class="res-title">Ejercicio físico en la menopausia: qué funciona y qué no</div><div class="res-meta">Dra. Paula Herrera · 18 min</div><span class="res-badge">Verificado por especialistas</span></div>
+      <div class="resource-card" data-type="articulo"><div class="res-type" style="color:#1a5fa0">Artículo</div><div class="res-title">Salud ósea y menopausia: prevención de la osteoporosis</div><div class="res-meta">Equipo JUNTAS · 7 min de lectura</div><span class="res-badge">Verificado por especialistas</span></div>
+    </div>
+
+    <!-- COMUNIDAD -->
+    <div class="content" id="tab-comunidad">
+      <div class="section-label">Próximos eventos</div>
+      <div class="event-card"><div class="ev-date"><div class="ev-month">Mar</div><div class="ev-day">20</div></div><div class="ev-info"><div class="ev-title">Taller: Mindfulness y control de calores</div><div class="ev-detail">Virtual · 10:00 am · 90 min · 24 cupos</div><span class="ev-badge" style="background:var(--primary5);color:var(--primary)">Taller</span></div></div>
+      <button class="inscribir-btn" data-ev="taller-mindfulness-mar20" onclick="toggleInscripcion(this,'Taller: Mindfulness y control de calores','20 de marzo, 10:00 am','Virtual · 90 min')">Inscribirme</button>
+      <div class="event-card"><div class="ev-date"><div class="ev-month">Mar</div><div class="ev-day">27</div></div><div class="ev-info"><div class="ev-title">Charla: Nutrición hormonal con la Dra. Sofía Méndez</div><div class="ev-detail">Presencial, Bogotá · 6:00 pm · 60 min</div><span class="ev-badge" style="background:var(--chip-sleep-bg);color:var(--chip-sleep-tx)">Charla</span></div></div>
+      <button class="inscribir-btn" data-ev="charla-nutricion-mar27" onclick="toggleInscripcion(this,'Charla: Nutrición hormonal','27 de marzo, 6:00 pm','Presencial, Bogotá · 60 min')">Inscribirme</button>
+      <div class="event-card"><div class="ev-date"><div class="ev-month">Abr</div><div class="ev-day">5</div></div><div class="ev-info"><div class="ev-title">Foro abierto: Experiencias en la transición a la menopausia</div><div class="ev-detail">Virtual · 4:00 pm · Entrada libre</div><span class="ev-badge" style="background:var(--chip-food-bg);color:var(--chip-food-tx)">Foro</span></div></div>
+      <button class="inscribir-btn" data-ev="foro-abril5" onclick="toggleInscripcion(this,'Foro abierto: Menopausia','5 de abril, 4:00 pm','Virtual · Entrada libre')">Unirme</button>
+      <div class="event-card"><div class="ev-date"><div class="ev-month">Abr</div><div class="ev-day">19</div></div><div class="ev-info"><div class="ev-title">Retiro de bienestar: Un fin de semana para reconectarte</div><div class="ev-detail">Villa de Leyva · 2 días · Cupos limitados</div><span class="ev-badge" style="background:var(--primary4);color:var(--primary)">Retiro</span></div></div>
+      <button class="inscribir-btn" data-ev="retiro-abril19" onclick="toggleInscripcion(this,'Retiro de bienestar','19–20 de abril','Villa de Leyva · 2 días')">Inscribirme</button>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-item active" data-nav="registro">
+      <svg class="nav-icon" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="5" width="16" height="14" rx="2"/><path d="M7 2v4M15 2v4M3 9h16"/><path d="M7 13h4M7 16h3" stroke-opacity=".45"/></svg>
+      <span class="nav-label">Registro</span>
+    </div>
+    <div class="nav-item" data-nav="aprende">
+      <svg class="nav-icon" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 5h14M4 9h10M4 13h12M4 17h8"/></svg>
+      <span class="nav-label">Aprende</span>
+    </div>
+    <div class="nav-item" data-nav="comunidad">
+      <svg class="nav-icon" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><circle cx="15" cy="8" r="3"/><path d="M2 19c0-3.314 2.686-5 6-5M11 19c0-3.314 2.686-5 6-5"/></svg>
+      <span class="nav-label">Comunidad</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL HORMONA -->
+<div class="modal-overlay" id="hormonaModal" onclick="if(event.target===this)closeHormonaModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Añadir resultados hormonales</div>
+    <label class="form-label">Fecha del análisis</label>
+    <input type="date" class="form-input" id="h-fecha">
+    <div class="form-row">
+      <div><label class="form-label">Estrógeno E2 (pg/mL)</label><input type="number" class="form-input" id="h-estro" placeholder="ej. 42"></div>
+      <div><label class="form-label">FSH (mUI/mL)</label><input type="number" class="form-input" id="h-fsh" placeholder="ej. 68"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="form-label">Progesterona (ng/mL)</label><input type="number" class="form-input" id="h-prog" placeholder="ej. 0.4" step="0.1"></div>
+      <div><label class="form-label">Testosterona (ng/dL)</label><input type="number" class="form-input" id="h-testo" placeholder="ej. 18"></div>
+    </div>
+    <button class="save-btn" onclick="saveHormonas()">Guardar resultados</button>
+  </div>
+</div>
+
+<!-- MODAL EVENTO -->
+<div class="modal-overlay" id="eventModal" onclick="if(event.target===this)closeEventModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="confirm-wrap">
+      <div class="confirm-circle">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l5 5 9-9" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="confirm-title">¡Inscripción confirmada!</div>
+      <div class="confirm-sub">Te esperamos, <span id="confirmName"></span></div>
+      <div class="confirm-card">
+        <div class="conf-row"><span class="conf-label">Evento</span><span class="conf-val" id="conf-evento"></span></div>
+        <div class="conf-row"><span class="conf-label">Fecha y hora</span><span class="conf-val" id="conf-fecha"></span></div>
+        <div class="conf-row"><span class="conf-label">Modalidad</span><span class="conf-val" id="conf-modal"></span></div>
+        <div class="conf-row"><span class="conf-label">Inscrita como</span><span class="conf-val" id="conf-nombre"></span></div>
+      </div>
+      <div class="notif-note"><div class="n-dot"></div><span class="n-text">Recibirás un recordatorio 1 hora antes en JUNTAS.</span></div>
+    </div>
+    <button class="save-btn" style="margin-top:16px" onclick="closeEventModal()">Volver</button>
+  </div>
+</div>
+
+<script>
+/* STORAGE */
+const ACCOUNTS_KEY='juntas_accounts';
+const SESSION_KEY='juntas_session';
+function getAccounts(){try{return JSON.parse(localStorage.getItem(ACCOUNTS_KEY))||{};}catch(e){return {};}}
+function saveAccounts(a){localStorage.setItem(ACCOUNTS_KEY,JSON.stringify(a));}
+function getUserData(u){try{return JSON.parse(localStorage.getItem('juntas_user_'+u))||defData();}catch(e){return defData();}}
+function saveUserData(u,d){localStorage.setItem('juntas_user_'+u,JSON.stringify(d));}
+function defData(){return{entries:[],inscripciones:[],hormonas:[]};}
+function getSession(){try{return localStorage.getItem(SESSION_KEY)||null;}catch(e){return null;}}
+function setSession(u){if(u)localStorage.setItem(SESSION_KEY,u);else localStorage.removeItem(SESSION_KEY);}
+
+/* STATE */
+let cu=null; // {username,nombre}
+let D=defData();
+let sMood=null,sHeat=null,sFood=null;
+const mL={1:'Difícil',2:'Regular',3:'Bien',4:'Muy bien',5:'Excelente'};
+const mE={1:'😔',2:'😐',3:'🙂',4:'😊',5:'😄'};
+
+/* AUTH */
+function switchAuthTab(t){
+  document.querySelectorAll('.auth-tab').forEach((x,i)=>x.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
+  document.getElementById('loginForm').classList.toggle('active',t==='login');
+  document.getElementById('registerForm').classList.toggle('active',t==='register');
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('registerErr').textContent='';
+}
+function doRegister(){
+  const name=document.getElementById('regName').value.trim();
+  const user=document.getElementById('regUser').value.trim().toLowerCase().replace(/\s+/g,'');
+  const pass=document.getElementById('regPass').value;
+  const err=document.getElementById('registerErr');
+  if(!name||!user||!pass){err.textContent='Completa todos los campos.';return;}
+  if(pass.length<4){err.textContent='Contraseña: mínimo 4 caracteres.';return;}
+  const acc=getAccounts();
+  if(acc[user]){err.textContent='Ese usuario ya existe.';return;}
+  acc[user]={nombre:name,pass:btoa(pass)};
+  saveAccounts(acc);
+  loginUser(user,name);
+}
+function doLogin(){
+  const user=document.getElementById('loginUser').value.trim().toLowerCase().replace(/\s+/g,'');
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  if(!user||!pass){err.textContent='Completa usuario y contraseña.';return;}
+  const acc=getAccounts();
+  if(!acc[user]||acc[user].pass!==btoa(pass)){err.textContent='Usuario o contraseña incorrectos.';return;}
+  loginUser(user,acc[user].nombre);
+}
+function loginUser(username,nombre){
+  cu={username,nombre};
+  setSession(username);
+  D=getUserData(username);
+  document.getElementById('authScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  updateClock();updateHeader();updateMetrics();renderHistorial();renderHormonas();restoreInscripciones();resetForm();switchTab('registro');
+}
+function doLogout(){
+  setSession(null);cu=null;D=defData();
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('authScreen').classList.add('active');
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').textContent='';
+  switchAuthTab('login');
+  renderQuickAccess();
+}
+function renderQuickAccess(){
+  const acc=getAccounts();const row=document.getElementById('avatarRow');const sec=document.getElementById('quickSection');
+  const keys=Object.keys(acc);
+  if(!keys.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  row.innerHTML=keys.map(u=>{
+    const init=acc[u].nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="user-av" onclick="quickLogin('${u}')"><div class="av-circle">${init}</div><div class="av-name">${acc[u].nombre.split(' ')[0]}</div></div>`;
+  }).join('');
+}
+function quickLogin(u){const acc=getAccounts();if(acc[u])loginUser(u,acc[u].nombre);}
+
+/* DATE */
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function formatDate(iso){const d=new Date(iso+'T12:00:00');return d.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});}
+function updateClock(){
+  const n=new Date();
+  document.getElementById('statusTime').textContent=n.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  const days=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('headerDate').textContent=days[n.getDay()]+', '+n.getDate()+' de '+months[n.getMonth()];
+  document.getElementById('logDateLabel').textContent='Hoy, '+n.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* HEADER */
+function updateHeader(){
+  if(!cu)return;
+  document.getElementById('displayName').textContent=cu.nombre.split(' ')[0];
+  document.getElementById('confirmName').textContent=cu.nombre.split(' ')[0];
+  document.getElementById('conf-nombre').textContent=cu.nombre;
+  const s=calcStreak();
+  document.getElementById('streakText').textContent=s+(s===1?' día registrando':' días registrando');
+}
+function calcStreak(){
+  if(!D.entries.length)return 0;
+  const dates=[...new Set(D.entries.map(e=>e.date))].sort().reverse();
+  let streak=0;const d=new Date();
+  for(let i=0;i<dates.length;i++){
+    const exp=d.toISOString().split('T')[0];
+    if(dates[i]===exp){streak++;d.setDate(d.getDate()-1);}
+    else if(i===0&&dates[0]!==todayStr())break;
+    else break;
+  }
+  return streak;
+}
+
+/* METRICS */
+function updateMetrics(){
+  const te=D.entries.filter(e=>e.date===todayStr());const last=te[te.length-1];
+  if(!last){
+    ['m-mood','m-heat','m-food'].forEach(id=>document.getElementById(id).textContent='—');
+    document.getElementById('m-sleep').textContent='— h';
+    ['m-mood-sub','m-heat-sub','m-sleep-sub','m-food-sub'].forEach(id=>document.getElementById(id).textContent='Sin registro hoy');
+    ['bar-mood','bar-heat','bar-sleep','bar-food'].forEach(id=>document.getElementById(id).style.width='0%');
+    return;
+  }
+  if(last.mood){document.getElementById('m-mood').textContent=mE[last.mood]+' '+mL[last.mood];document.getElementById('m-mood-sub').textContent='Última entrada de hoy';document.getElementById('bar-mood').style.width=(last.mood/5*100)+'%';}
+  if(last.heat!=null){document.getElementById('m-heat').textContent=last.heat+(last.heat===4?'+':'')+' hoy';document.getElementById('m-heat-sub').textContent=last.heat===0?'Sin calores':last.heat<=1?'Intensidad leve':last.heat<=3?'Moderada':'Alta';document.getElementById('bar-heat').style.width=Math.min(last.heat/4*100,100)+'%';}
+  if(last.sleep){document.getElementById('m-sleep').textContent=last.sleep.toFixed(1)+' h';document.getElementById('m-sleep-sub').textContent=last.sleep>=7?'Buen descanso':last.sleep>=5?'Descanso moderado':'Poco descanso';document.getElementById('bar-sleep').style.width=((last.sleep-3)/7*100)+'%';}
+  if(last.food){document.getElementById('m-food').textContent=last.food;document.getElementById('m-food-sub').textContent='Registrada hoy';const fp={Excelente:100,Buena:75,Regular:50,Mejorable:25};document.getElementById('bar-food').style.width=(fp[last.food]||0)+'%';}
+}
+
+/* HISTORIAL */
+function renderHistorial(){
+  const list=document.getElementById('historialList');const noD=document.getElementById('noHistData');
+  const sorted=[...D.entries].sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts);
+  if(!sorted.length){noD.style.display='block';list.innerHTML='';return;}
+  noD.style.display='none';
+  const byDate={};sorted.forEach(e=>{if(!byDate[e.date])byDate[e.date]=[];byDate[e.date].push(e);});
+  list.innerHTML=Object.keys(byDate).map(date=>{
+    const last=byDate[date][0];const count=byDate[date].length>1?` <span style="font-size:11px;color:var(--text3)">${byDate[date].length} entradas</span>`:'';
+    const chips=[];
+    if(last.mood)chips.push(`<span class="hist-chip" style="background:var(--chip-mood-bg);color:var(--chip-mood-tx)">${mE[last.mood]} ${mL[last.mood]}</span>`);
+    if(last.heat!=null)chips.push(`<span class="hist-chip" style="background:var(--chip-heat-bg);color:var(--chip-heat-tx)">Calores: ${last.heat}${last.heat===4?'+':''}</span>`);
+    if(last.sleep)chips.push(`<span class="hist-chip" style="background:var(--chip-sleep-bg);color:var(--chip-sleep-tx)">${last.sleep.toFixed(1)}h sueño</span>`);
+    if(last.food)chips.push(`<span class="hist-chip" style="background:var(--chip-food-bg);color:var(--chip-food-tx)">${last.food}</span>`);
+    return `<div class="hist-entry"><div class="hist-date">${formatDate(date)}${count}</div><div class="hist-chips">${chips.join('')}</div></div>`;
+  }).join('');
+}
+
+/* HORMONAS */
+function renderHormonas(){
+  const noD=document.getElementById('noHormonaData');const list=document.getElementById('hormonaList');
+  if(!D.hormonas||!D.hormonas.length){noD.style.display='block';list.innerHTML='';return;}
+  noD.style.display='none';
+  list.innerHTML=D.hormonas.map((h,i)=>`
+    <div style="${i>0?'margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)':''}">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">${formatDate(h.fecha)}</div>
+      <table class="h-table">
+        <tr><th>Hormona</th><th>Valor</th><th>Estado</th></tr>
+        ${h.estro?`<tr><td>Estrógeno E2</td><td>${h.estro} pg/mL</td><td><span class="tag ${parseFloat(h.estro)<50?'tag-l':parseFloat(h.estro)>200?'tag-h':'tag-n'}">${parseFloat(h.estro)<50?'Bajo':parseFloat(h.estro)>200?'Elevado':'Normal'}</span></td></tr>`:''}
+        ${h.fsh?`<tr><td>FSH</td><td>${h.fsh} mUI/mL</td><td><span class="tag ${parseFloat(h.fsh)>40?'tag-h':parseFloat(h.fsh)<3?'tag-l':'tag-n'}">${parseFloat(h.fsh)>40?'Elevado':parseFloat(h.fsh)<3?'Bajo':'Normal'}</span></td></tr>`:''}
+        ${h.prog?`<tr><td>Progesterona</td><td>${h.prog} ng/mL</td><td><span class="tag tag-n">Normal</span></td></tr>`:''}
+        ${h.testo?`<tr><td>Testosterona</td><td>${h.testo} ng/dL</td><td><span class="tag tag-n">Normal</span></td></tr>`:''}
+      </table>
+    </div>`).join('');
+}
+function openHormonaModal(){
+  document.getElementById('h-fecha').value=todayStr();
+  ['h-estro','h-fsh','h-prog','h-testo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('hormonaModal').classList.add('open');
+}
+function closeHormonaModal(){document.getElementById('hormonaModal').classList.remove('open');}
+function saveHormonas(){
+  const h={fecha:document.getElementById('h-fecha').value,estro:document.getElementById('h-estro').value,fsh:document.getElementById('h-fsh').value,prog:document.getElementById('h-prog').value,testo:document.getElementById('h-testo').value,ts:Date.now()};
+  if(!h.estro&&!h.fsh&&!h.prog&&!h.testo){showToast('Ingresa al menos un valor');return;}
+  if(!D.hormonas)D.hormonas=[];
+  D.hormonas.unshift(h);
+  saveUserData(cu.username,D);
+  renderHormonas();closeHormonaModal();showToast('Resultados guardados ✓');
+}
+
+/* FORM */
+document.querySelectorAll('.mood-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.mood-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');sMood=parseInt(b.dataset.mood);}));
+document.querySelectorAll('.heat-dot').forEach(d=>d.addEventListener('click',()=>{document.querySelectorAll('.heat-dot').forEach(x=>x.classList.remove('active'));d.classList.add('active');sHeat=parseInt(d.dataset.v);}));
+document.querySelectorAll('.food-chip').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.food-chip').forEach(x=>x.classList.remove('selected'));c.classList.add('selected');sFood=c.dataset.f;}));
+const slider=document.getElementById('sleepSlider');
+const sliderVal=document.getElementById('sleepVal');
+slider.addEventListener('input',()=>{sliderVal.textContent=parseFloat(slider.value).toFixed(1)+' h';});
+function resetForm(){
+  document.querySelectorAll('.mood-btn,.heat-dot,.food-chip').forEach(x=>x.classList.remove('selected','active'));
+  sMood=null;sHeat=null;sFood=null;slider.value=7;sliderVal.textContent='7.0 h';
+}
+document.getElementById('saveBtn').addEventListener('click',()=>{
+  if(!cu)return;
+  if(!sMood&&sHeat===null&&!sFood){showToast('Selecciona al menos un dato');return;}
+  const entry={date:todayStr(),mood:sMood,heat:sHeat,sleep:parseFloat(slider.value),food:sFood,ts:Date.now()};
+  D.entries.push(entry);
+  saveUserData(cu.username,D);
+  updateMetrics();renderHistorial();updateHeader();
+  showToast('Registro guardado ✓');resetForm();
+});
+
+/* TABS */
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.nav===name));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelector('.scroll-content').scrollTop=0;
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>switchTab(n.dataset.nav)));
+document.querySelectorAll('.filter-chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+  const f=c.dataset.f;document.querySelectorAll('.resource-card').forEach(card=>{card.style.display=(f==='all'||card.dataset.type===f)?'block':'none';});
+}));
+
+/* EVENTOS */
+function toggleInscripcion(btn,titulo,fecha,modalidad){
+  if(!cu)return;
+  const ev=btn.dataset.ev;const idx=D.inscripciones.indexOf(ev);
+  if(idx===-1){
+    D.inscripciones.push(ev);saveUserData(cu.username,D);
+    btn.textContent='✓ Inscrita';btn.classList.add('inscrito');
+    document.getElementById('conf-evento').textContent=titulo;
+    document.getElementById('conf-fecha').textContent=fecha;
+    document.getElementById('conf-modal').textContent=modalidad.split('·')[0].trim();
+    document.getElementById('confirmName').textContent=cu.nombre.split(' ')[0];
+    document.getElementById('conf-nombre').textContent=cu.nombre;
+    document.getElementById('eventModal').classList.add('open');
+  }else{
+    D.inscripciones.splice(idx,1);saveUserData(cu.username,D);
+    btn.textContent=ev.includes('foro')?'Unirme':'Inscribirme';btn.classList.remove('inscrito');
+    showToast('Inscripción cancelada');
+  }
+}
+function closeEventModal(){document.getElementById('eventModal').classList.remove('open');}
+function restoreInscripciones(){
+  document.querySelectorAll('.inscribir-btn').forEach(btn=>{
+    if(D.inscripciones.includes(btn.dataset.ev)){btn.textContent='✓ Inscrita';btn.classList.add('inscrito');}
+    else{btn.classList.remove('inscrito');btn.textContent=btn.dataset.ev.includes('foro')?'Unirme':'Inscribirme';}
+  });
+}
+
+/* TOAST */
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ENTER KEY */
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('regPass').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+
+/* PWA */
+if('serviceWorker'in navigator){
+  const sw=`const C='juntas-v3';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+}
+
+/* INIT */
+updateClock();setInterval(updateClock,30000);renderQuickAccess();
+const saved=getSession();
+if(saved){const acc=getAccounts();if(acc[saved])loginUser(saved,acc[saved].nombre);}
+</script>
+</body>
+</html>
